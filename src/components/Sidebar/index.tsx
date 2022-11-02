@@ -7,8 +7,6 @@ import {
   DrawerHeader,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { useSideBarDrawer } from "../../contexts/SideBarDrawerContent";
 import { SideBarNav } from "./SideBarNav";
 
