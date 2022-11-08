@@ -52,7 +52,7 @@ export const Pagination = ({
       <Stack direction="row" spacing="2">
         {currentPage > 1 + siblingCount && (
           <>
-            <PaginationItem number={1} />
+            <PaginationItem onPageChange={onPageChange} number={1} />
             {currentPage > 2 + siblingCount && (
               <Text color="gray.300" width="8" textAlign="center">
                 ...
@@ -63,13 +63,29 @@ export const Pagination = ({
 
         {previousPage.length > 0 &&
           previousPage.map((page) => {
-            return <PaginationItem key={page} number={page} />;
+            return (
+              <PaginationItem
+                onPageChange={onPageChange}
+                key={page}
+                number={page}
+              />
+            );
           })}
-        <PaginationItem number={currentPage} isCurrent />
+        <PaginationItem
+          onPageChange={onPageChange}
+          number={currentPage}
+          isCurrent
+        />
 
         {nextPages.length > 0 &&
           nextPages.map((page) => {
-            return <PaginationItem key={page} number={page} />;
+            return (
+              <PaginationItem
+                onPageChange={onPageChange}
+                key={page}
+                number={page}
+              />
+            );
           })}
 
         {currentPage + siblingCount < lastPage && (
@@ -79,7 +95,7 @@ export const Pagination = ({
                 ...
               </Text>
             )}
-            <PaginationItem number={lastPage} />
+            <PaginationItem onPageChange={onPageChange} number={lastPage} />
           </>
         )}
       </Stack>

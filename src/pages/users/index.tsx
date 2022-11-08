@@ -5,6 +5,7 @@ import {
   Flex,
   Heading,
   Icon,
+  Link,
   Spinner,
   Table,
   Tbody,
@@ -15,24 +16,32 @@ import {
   Tr,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import { useEffect } from "react";
+import NextLink from "next/link";
+import { useEffect, useState } from "react";
 import { AiOutlineReload } from "react-icons/ai";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { SideBar } from "../../components/Sidebar";
 import { useUsers } from "../../services/hooks/useUsers";
+import { queryClient } from "../../services/queryClient";
+import { api } from "./../../services/api";
 
 const UserList = () => {
-  const { data, isLoading, isFetching, error, refetch } = useUsers();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isFetching, error, refetch } = useUsers(page);
 
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
   });
+  async function handlePrefetchUser(userId: number) {
+    await queryClient.prefetchQuery(["user", userId], async () => {
+      const response = await api.get(`users/${userId}`);
 
-  useEffect(() => {}, []);
+      return response.data;
+    });
+  }
 
   return (
     <Box>
@@ -58,7 +67,7 @@ const UserList = () => {
               >
                 Atualizar Tabela
               </Button>
-              <Link href="/users/create" passHref>
+              <NextLink href="/users/create" passHref>
                 <Button
                   as="a"
                   size="sm"
@@ -68,7 +77,7 @@ const UserList = () => {
                 >
                   Criar novo
                 </Button>
-              </Link>
+              </NextLink>
             </div>
           </Flex>
           {isLoading ? (
@@ -93,17 +102,21 @@ const UserList = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {data?.map((item: any) => (
+                  {data?.users.map((item: any) => (
                     <Tr key={item.id}>
                       <Td px={["4", "4", "6"]}>
                         <Checkbox colorScheme="pink" />
                       </Td>
                       <Td>
                         <Box>
-                          <Text fontWeight="bold">{item.name}</Text>
-                          <Text fontSize="sm" color="gray.300">
-                            {item.email}
-                          </Text>
+                          <Link
+                            onMouseEnter={() => handlePrefetchUser(item.id)}
+                          >
+                            <Text fontWeight="bold">{item.name}</Text>
+                            <Text fontSize="sm" color="gray.300">
+                              {item.email}
+                            </Text>
+                          </Link>
                         </Box>
                       </Td>
                       {isWideVersion && <Td>{item.createdAt}</Td>}
@@ -123,9 +136,9 @@ const UserList = () => {
                 </Tbody>
               </Table>
               <Pagination
-                totalCountOfRegisters={200}
-                currentPage={5}
-                onPageChange={() => {}}
+                totalCountOfRegisters={data.totalCount}
+                currentPage={page}
+                onPageChange={setPage}
               />
             </>
           )}
